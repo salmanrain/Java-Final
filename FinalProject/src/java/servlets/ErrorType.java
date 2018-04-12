@@ -1,7 +1,7 @@
 package servlets;
 
 public enum ErrorType {
-    ERROR404("Error 404 that page dosnt exist, sorry bud"),
+    ERROR404("Error 404 that page doesn't exist, sorry bud"),
     PRIVLEGE_EERROR("You have inccorect privleges.");
     
     private String errorMsg;
