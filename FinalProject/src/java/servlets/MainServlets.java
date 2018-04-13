@@ -34,9 +34,9 @@ import javax.servlet.http.HttpSession;
 public class MainServlets extends HttpServlet {
 
     PrintMarkingDAO printMarkingDAO;
-    HttpSession sessionObj = null;
+    HttpSession sessionObj;
     User user;
-    boolean loggedIn;
+    boolean loggedIn, admin;
 
     public void init() { // initializing the jdbc's url,username, and password in the studentDAO class so that class can connect to the database
         String jdbcURL = getServletContext().getInitParameter("jdbcURL");
@@ -53,11 +53,14 @@ public class MainServlets extends HttpServlet {
         String servletPath = request.getServletPath();
         try {
             ErrorType error = ErrorType.ERROR404;
+            sessionObj = request.getSession();
             if(!sessionObj.isNew()){
                 loggedIn = true;
             }
             
-            boolean admin = loggedIn?false:((User) sessionObj.getAttribute("userSession")).userType.equals(UserType.ADMIN);
+            if(loggedIn) {
+                admin = ((User) sessionObj.getAttribute("userSession")).userType.equals(UserType.ADMIN);
+            }
             while (true) {
                 switch (servletPath) {
                     case "/register": // 
@@ -98,13 +101,15 @@ public class MainServlets extends HttpServlet {
                         break;
                     case "Error": // Error page
                     default:
-                       
+                      // Error(error, request, response);
                         response.sendRedirect("Login.jsp");
                 }
                 break;
             }
         } catch (SQLException ex) {
             Logger.getLogger(MainServlets.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (NullPointerException e){
+            e.printStackTrace();
         }
 
     }
@@ -142,6 +147,7 @@ public class MainServlets extends HttpServlet {
     }
 
     private void login(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
+        // check to see if the value is the same as it is in the database
         user = printMarkingDAO.logIn(request.getParameter("userName"), request.getParameter("password"));
         if (user != null) {
             sessionObj.setAttribute("userSession", user);
