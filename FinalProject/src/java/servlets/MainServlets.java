@@ -25,6 +25,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 /**
  *
@@ -33,6 +34,9 @@ import javax.servlet.http.HttpServletResponse;
 public class MainServlets extends HttpServlet {
 
     PrintMarkingDAO printMarkingDAO;
+    HttpSession sessionObj;
+    User user;
+    boolean loggedIn;
 
     public void init() { // initializing the jdbc's url,username, and password in the studentDAO class so that class can connect to the database
         String jdbcURL = getServletContext().getInitParameter("jdbcURL");
@@ -49,15 +53,32 @@ public class MainServlets extends HttpServlet {
         String servletPath = request.getServletPath();
         try {
             ErrorType error = ErrorType.ERROR404;
+            if(!sessionObj.isNew()){
+                loggedIn = true;
+            }
+            
+            boolean admin = loggedIn?false:((User) sessionObj.getAttribute("userSession")).userType.equals(UserType.ADMIN);
             while (true) {
                 switch (servletPath) {
                     case "/register": // 
                     case "/login":
-                        System.out.println("it came here it works");
+                        if (!loggedIn) {
+                            login(request, response);
+                        } else {
+                            error = ErrorType.ALREADY_LOGGEDIN_ERROR;
+                            servletPath = "Error";
+                            continue;
+                        }
+                        break;
+                    case "/logout":
+                        if (loggedIn) {
+                            logout(request, response);
+                        } else {
+                            servletPath = "/login";
+                            continue;
+                        }
                         break;
                     case "/admin":
-                        boolean loggedIn = false;
-                        boolean admin = false;
                         if (!loggedIn) {
                             servletPath = "/login";
                             continue;
@@ -77,7 +98,8 @@ public class MainServlets extends HttpServlet {
                         break;
                     case "Error": // Error page
                     default:
-                        Error(error, request, response);
+                       
+                        response.sendRedirect("Login.jsp");
                 }
                 break;
             }
@@ -112,11 +134,27 @@ public class MainServlets extends HttpServlet {
         }
         response.sendRedirect("listTable");
     }
-    
+
     private void Error(ErrorType error, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         RequestDispatcher dispatcher = request.getRequestDispatcher("Error.jsp");
         request.setAttribute("errorMsg", error.toString());
         dispatcher.forward(request, response);
+    }
+
+    private void login(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
+        user = printMarkingDAO.logIn(request.getParameter("userName"), request.getParameter("password"));
+        if (user != null) {
+            sessionObj.setAttribute("userSession", user);
+        } else {
+            RequestDispatcher dispatcher = request.getRequestDispatcher("Login.jsp");
+            request.setAttribute("errorMsg", "Incorrect Login");
+            dispatcher.forward(request, response);
+        }
+    }
+
+    private void logout(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
+        sessionObj.removeAttribute("UsernameStringKey");
+        response.sendRedirect("Login.jsp");
     }
 
     private SQLCommands search(int Id, CType cType) throws ServletException, IOException, SQLException {

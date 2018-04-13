@@ -55,6 +55,21 @@ public class PrintMarkingDAO {
             jdbcConnection.close();
         }
     }
+    
+    public User logIn(String userName, String password) throws SQLException {
+
+        User toReturn = null;
+
+        connect();
+
+        Statement statement = jdbcConnection.createStatement();
+        
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM User WHERE userName LIKE '" + userName + "' AND password LIKE '" + password + "'");
+    
+        toReturn = new User(resultSet.getInt("id"), resultSet.getString("userName"), UserType.getUserType(resultSet.getInt("userType")));
+        
+        return toReturn;
+    }
 
     public SQLCommands SqlCommand(SQLCommands SQLCommand) throws SQLException {
         // the SQLCommands is represented as the parent class for every table/class
