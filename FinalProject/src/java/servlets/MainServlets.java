@@ -34,7 +34,7 @@ import javax.servlet.http.HttpSession;
 public class MainServlets extends HttpServlet {
 
     PrintMarkingDAO printMarkingDAO;
-    HttpSession sessionObj;
+    HttpSession sessionObj = null;
     User user;
     boolean loggedIn;
 
@@ -65,7 +65,7 @@ public class MainServlets extends HttpServlet {
                         if (!loggedIn) {
                             login(request, response);
                         } else {
-                            error = ErrorType.ALREADY_LOGGEDIN_ERROR;
+                            //error = ErrorType.ALREADY_LOGGEDIN_ERROR;
                             servletPath = "Error";
                             continue;
                         }
@@ -83,7 +83,7 @@ public class MainServlets extends HttpServlet {
                             servletPath = "/login";
                             continue;
                         } else if (!admin) {
-                            error = ErrorType.PRIVLEGE_EERROR;
+                            //error = ErrorType.PRIVLEGE_EERROR;
                             servletPath = "Error";
                             continue;
                         }
