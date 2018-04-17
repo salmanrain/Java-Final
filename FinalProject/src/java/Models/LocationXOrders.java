@@ -13,6 +13,7 @@ public class LocationXOrders extends SQLCommands{
     
     private int orderId;
     private int agentId;
+    
 
     public LocationXOrders(int orderId, int agentId) {
         this.orderId = orderId;

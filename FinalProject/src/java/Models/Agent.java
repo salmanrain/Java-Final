@@ -4,13 +4,34 @@ public class Agent extends SQLCommands{
     
     private String firstName;
     private String lastName;
-    private String phoneNum;
+    private String phoneNo;
     private String email;
+    
+    public int getID() {
+        return ID;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public String getPhoneNo() {
+        return phoneNo;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+    
     
     public Agent(String firstName, String lastName, String phoneNum, String email) {
         this.firstName = firstName;
         this.lastName = lastName;
-        this.phoneNum = phoneNum;
+        this.phoneNo = phoneNum;
         this.email = email;
         cType = CType.AGENT;
         qType = QType.INSERT;
@@ -30,9 +51,9 @@ public class Agent extends SQLCommands{
         if (qType.equals(QType.SEARCH) || qType.equals(QType.DELETE)) {
             return String.valueOf(ID);
         } else if (qType.equals(QType.INSERT)) {
-            return "null, '" + firstName + "', '" + lastName + "', '" + phoneNum + "', '" + email + "'";
+            return "null, '" + firstName + "', '" + lastName + "', '" + phoneNo + "', '" + email + "'";
         } else {// type.equals(Qtype.UPDATE)
-            return "firstName = '" + firstName + "', lastName = '" + lastName + "', phoneNum = '" + phoneNum + "', email = '" + email + "'";
+            return "firstName = '" + firstName + "', lastName = '" + lastName + "', phoneNo = '" + phoneNo + "', email = '" + email + "'";
         }
     }
 

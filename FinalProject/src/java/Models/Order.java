@@ -1,6 +1,8 @@
 
 package Models;
 
+import java.sql.Blob;
+
 
 public class Order extends SQLCommands {
     
@@ -8,15 +10,65 @@ public class Order extends SQLCommands {
     private int clientId;
     private int flyerQty;
     private String flyerLayout;
-    private String flyerImg; 
+    private Blob flyerImg; 
     private int personalCopy;
     private String paymentInformation;
     private String invoiceNumber;
     private String comments;
     private int isFlyerArtApproved;
     private int isPaymentReceived;
+    
+    public int getID() {
+        return ID;
+    }
 
-    public Order(int agentId, int clientId, int flyerQty, String flyerLayout, String flyerImg, int personalCopy, String paymentInformation, String invoiceNumber, String comments, int isFlyerArtApproved, int isPaymentReceived) {
+    public int getAgentId() {
+        return agentId;
+    }
+
+    public int getClientId() {
+        return clientId;
+    }
+
+    public int getFlyerQty() {
+        return flyerQty;
+    }
+
+    public String getFlyerLayout() {
+        return flyerLayout;
+    }
+
+    public Blob getFlyerImg() {
+        return flyerImg;
+    }
+
+    public int getPersonalCopy() {
+        return personalCopy;
+    }
+
+    public String getPaymentInformation() {
+        return paymentInformation;
+    }
+
+    public String getInvoiceNumber() {
+        return invoiceNumber;
+    }
+
+    public String getComments() {
+        return comments;
+    }
+
+    public int getIsFlyerArtApproved() {
+        return isFlyerArtApproved;
+    }
+
+    public int getIsPaymentReceived() {
+        return isPaymentReceived;
+    }
+    
+    
+
+    public Order(int agentId, int clientId, int flyerQty, String flyerLayout, Blob flyerImg, int personalCopy, String paymentInformation, String invoiceNumber, String comments, int isFlyerArtApproved, int isPaymentReceived) {
         this.agentId = agentId;
         this.clientId = clientId;
         this.flyerQty = flyerQty;
@@ -33,7 +85,7 @@ public class Order extends SQLCommands {
         qType = QType.INSERT;
     }
     
-    public Order(int ID, int agentId, int clientId, int flyerQty, String flyerLayout, String flyerImg, int personalCopy, String paymentInformation, String invoiceNumber, String comments, int isFlyerArtApproved, int isPaymentReceived) {
+    public Order(int ID, int agentId, int clientId, int flyerQty, String flyerLayout, Blob flyerImg, int personalCopy, String paymentInformation, String invoiceNumber, String comments, int isFlyerArtApproved, int isPaymentReceived) {
         this(agentId, clientId, flyerQty, flyerLayout, flyerImg, personalCopy, paymentInformation, invoiceNumber, comments, isFlyerArtApproved, isPaymentReceived);
         if (ID != -1) {
             this.ID = ID;

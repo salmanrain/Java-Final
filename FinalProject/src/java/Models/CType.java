@@ -17,12 +17,21 @@ public enum CType {
     }
     
     public static CType getCType(String type) {
-        switch(type) {
-            case "Location" :
-                return CType.LOCATION;
+         type = type == null?"Location":type;
+            switch(type.toUpperCase()) {
+            case "LOCATION" :
+                return LOCATION;
+            case "AGENT":
+                return AGENT;
+            case "CLIENTS":
+                return CLIENT;
+            case "ORDERS":
+                return ORDER;
+            case "LOCATIONXORDER":
+                return LOCATIONXORDER;
             default:
                 return null;
-        }
+            }
     }
 
     private CType(String tableName) {

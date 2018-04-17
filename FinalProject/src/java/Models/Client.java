@@ -23,6 +23,60 @@ public class Client extends SQLCommands {
     private String email;
     private String company;
     private String companyType;
+    
+    public int getID() {
+        return ID;
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public int getStreetNumber() {
+        return streetNumber;
+    }
+
+    public String getStreetName() {
+        return streetName;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public String getPostalCode() {
+        return postalCode;
+    }
+
+    public String getTelOffice() {
+        return telOffice;
+    }
+
+    public String getTelCell() {
+        return telCell;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getCompany() {
+        return company;
+    }
+
+    public String getCompanyType() {
+        return companyType;
+    }
+    
+    
 
     public Client(String firstName, String lastName, int streetNumber, String streetName, String city, String province, String postalCode, String telOffice, String telCell, String email, String company, String companyType) {
         this.firstName = firstName;

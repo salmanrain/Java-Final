@@ -7,6 +7,7 @@ package servlets;
 
 //Delete Agent when converting Agent to Admin, and Create Agent when converting Admin to Agent
 import Models.Agent;
+import Models.*;
 import Models.CType;
 import Models.Location;
 import Models.SQLCommands;
@@ -14,9 +15,13 @@ import Models.User;
 import Models.UserType;
 import com.sun.jndi.toolkit.ctx.Continuation;
 import dao.PrintMarkingDAO;
+import java.awt.Button;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -54,11 +59,11 @@ public class MainServlets extends HttpServlet {
         try {
             ErrorType error = ErrorType.ERROR404;
             sessionObj = request.getSession();
-            if(!sessionObj.isNew()){
+            if (sessionObj.getAttribute("userSession") != null) {
                 loggedIn = true;
             }
-            
-            if(loggedIn) {
+
+            if (loggedIn) {
                 admin = ((User) sessionObj.getAttribute("userSession")).userType.equals(UserType.ADMIN);
             }
             while (true) {
@@ -68,7 +73,7 @@ public class MainServlets extends HttpServlet {
                         if (!loggedIn) {
                             login(request, response);
                         } else {
-                            //error = ErrorType.ALREADY_LOGGEDIN_ERROR;
+                            error = ErrorType.ALREADY_LOGGEDIN_ERROR;
                             servletPath = "Error";
                             continue;
                         }
@@ -86,29 +91,41 @@ public class MainServlets extends HttpServlet {
                             servletPath = "/login";
                             continue;
                         } else if (!admin) {
-                            //error = ErrorType.PRIVLEGE_EERROR;
+                            error = ErrorType.PRIVLEGE_EERROR;
                             servletPath = "Error";
                             continue;
                         }
+                        admin(request, response);
+                        break;
+                    case "/agent":
+                        if (!loggedIn) {
+                            servletPath = "/login";
+                            continue;
+                        } else if (admin) {
+                            servletPath = "/admin";
+                            continue;
+                        }
+                        //agent(request, response);
+                        break;
                     case "/updateTable"://Insert, Update 
                         updateTable(request, response);
                         break;
                     case "/delete": // delete
                         delete(request, response);
                         break;
-                    case "/listTable": // list table
-                        listTable(request, response);
-                        break;
                     case "Error": // Error page
                     default:
-                      // Error(error, request, response);
-                        response.sendRedirect("Login.jsp");
+                        if (loggedIn) {
+                            Error(error, request, response);
+                        } else {
+                            response.sendRedirect("Login.jsp");
+                        }
                 }
                 break;
             }
         } catch (SQLException ex) {
             Logger.getLogger(MainServlets.class.getName()).log(Level.SEVERE, null, ex);
-        } catch (NullPointerException e){
+        } catch (NullPointerException e) {
             e.printStackTrace();
         }
 
@@ -151,6 +168,11 @@ public class MainServlets extends HttpServlet {
         user = printMarkingDAO.logIn(request.getParameter("userName"), request.getParameter("password"));
         if (user != null) {
             sessionObj.setAttribute("userSession", user);
+            if (user.userType.equals(UserType.ADMIN)) {
+                admin(request, response);
+            } else {
+
+            }
         } else {
             RequestDispatcher dispatcher = request.getRequestDispatcher("Login.jsp");
             request.setAttribute("errorMsg", "Incorrect Login");
@@ -201,13 +223,24 @@ public class MainServlets extends HttpServlet {
     }
 
     //Add if else
-    private void listTable(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
-        //if 
-        List<Location> locate = printMarkingDAO.SqlCommandLocationSearch();
-        request.setAttribute("listLocate", locate);
-        //else
-        //List<Other> other = printMarkingDAO.SqlCommandLocationSearch();
-        //request.setAttribute("listLocate", other);
+    private void admin(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
+        CType cType = CType.getCType(request.getParameter("tableType"));
+        ArrayList<SQLCommands> tableView = printMarkingDAO.getTable(cType);
+        request.setAttribute("tableListType", cType.getTable());
+        
+        switch (cType) {
+            case LOCATION:
+                request.setAttribute("tableListLocation", (new ArrayList<Location>((Collection) tableView)));
+                break;
+            case AGENT:
+                request.setAttribute("tableListAgent", (new ArrayList<Agent>((Collection) tableView)));
+                break;
+            case CLIENT:
+                request.setAttribute("tableListClient", (new ArrayList<Client>((Collection) tableView)));
+                break;
+            case ORDER:
+                request.setAttribute("tableListOrder", (new ArrayList<Client>((Collection) tableView)));
+        }
 
         RequestDispatcher dispatcher = request.getRequestDispatcher("/Admin.jsp");
         dispatcher.forward(request, response);

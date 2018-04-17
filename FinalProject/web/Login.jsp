@@ -1,4 +1,3 @@
-<%@taglib prefix="sql" uri="http://java.sun.com/jsp/jstl/sql"%>
 <%-- 
     Document   : Login
     Created on : 11-Apr-2018, 5:39:20 PM
@@ -14,7 +13,7 @@
         <title>Sign In</title>
     </head>
     <body>
-        <form action="MainServlets" method="post" >
+        <form action="login" method="post" >
             <label><c:out value="${errorMsg}" /></label>
             UserName:
             <input type="text" name="userName" /><br />
@@ -22,7 +21,7 @@
             <input type="password" name="password" />
             <br />
             <br />
-            <input type="submit" name="submit" value="sign in" formaction="login" />
+            <input type="submit" name="submit" value="sign in"  />
         </form>
     </body>
 </html>

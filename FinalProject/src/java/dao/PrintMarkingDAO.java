@@ -6,6 +6,7 @@
 package dao;
 
 import Models.Agent;
+import Models.*;
 import Models.CType;
 import Models.Location;
 import Models.QType;
@@ -55,7 +56,7 @@ public class PrintMarkingDAO {
             jdbcConnection.close();
         }
     }
-    
+
     public User logIn(String userName, String password) throws SQLException {
 
         User toReturn = null;
@@ -63,11 +64,13 @@ public class PrintMarkingDAO {
         connect();
 
         Statement statement = jdbcConnection.createStatement();
-        
-        ResultSet resultSet = statement.executeQuery("SELECT * FROM User WHERE userName LIKE '" + userName + "' AND password LIKE '" + password + "'");
-    
-        toReturn = new User(resultSet.getInt("id"), resultSet.getString("userName"), UserType.getUserType(resultSet.getInt("userType")));
-        
+
+        ResultSet resultSet = statement.executeQuery("SELECT * FROM user WHERE userName LIKE '" + userName + "' AND password LIKE '" + password + "'");
+
+        if (resultSet.next()) {
+            toReturn = new User(resultSet.getInt("id"), resultSet.getString("userName"), UserType.getUserType(resultSet.getInt("userType")));
+        }
+
         return toReturn;
     }
 
@@ -89,7 +92,7 @@ public class PrintMarkingDAO {
             ResultSet resultSet = statement.executeQuery(command);
 
             Agent agentTemp = null;
-            
+
             switch (SQLCommand.cType) {
                 case LOCATION:
                     toReturn = new Location(resultSet.getInt("id"), resultSet.getString("locationName"), resultSet.getInt("distributionCapacity"));
@@ -112,12 +115,12 @@ public class PrintMarkingDAO {
 
     }
 
-    public List<Location> SqlCommandLocationSearch() throws SQLException {
+    public ArrayList<SQLCommands> getTable(CType cType) throws SQLException {
 
         //get all values from the Location table and add it to the table list
-        String sql = "SELECT * FROM Location";
+        String sql = "SELECT * FROM " + cType.getTable();
 
-        List<Location> allLocate = new ArrayList();
+        ArrayList<SQLCommands> tableView = new ArrayList();
 
         connect();
 
@@ -125,7 +128,20 @@ public class PrintMarkingDAO {
         ResultSet resultSet = statement.executeQuery(sql);
 
         while (resultSet.next()) { // going through the result set
-            allLocate.add(new Location(resultSet.getInt("id"), resultSet.getString("locationName"), resultSet.getInt("distributionCapacity")));
+            switch (cType) {
+                case LOCATION:
+                    tableView.add(new Location(resultSet.getInt("id"), resultSet.getString("locationName"), resultSet.getInt("distributionCapacity")));
+                    break;
+                case AGENT:
+                    tableView.add(new Agent(resultSet.getInt("id"), resultSet.getString("firstName"), resultSet.getString("lastName"), resultSet.getString("phoneNo"), resultSet.getString("email")));
+                    break;
+                case CLIENT:
+                    tableView.add(new Client(resultSet.getInt("id"),resultSet.getString("firstName"),resultSet.getString("lastName"),resultSet.getInt("streetNumber"),resultSet.getString("streetName"),resultSet.getString("city"),resultSet.getString("province"),resultSet.getString("postalCode"), resultSet.getString("telOffice"), resultSet.getString("telCell"),resultSet.getString("email"),resultSet.getString("company"),resultSet.getString("companyType")));
+                    break;
+                case ORDER:
+                    tableView.add(new Order(resultSet.getInt("id"),resultSet.getInt("agentId"),resultSet.getInt("clientId"),resultSet.getInt("flyerQty"),resultSet.getString("flyerLayout"),resultSet.getBlob("flyerImg"),resultSet.getInt("personalCopy"), resultSet.getString("paymentInformation"),resultSet.getString("invoiceNumber"),resultSet.getString("comments"), resultSet.getInt("isFlyerArtApproved"),resultSet.getInt("isPaymentReceived")));
+                    break;
+            }
         }
 
         resultSet.close();
@@ -133,7 +149,7 @@ public class PrintMarkingDAO {
 
         disconnect();
 
-        return allLocate;
+        return tableView;
     }
 
 }
