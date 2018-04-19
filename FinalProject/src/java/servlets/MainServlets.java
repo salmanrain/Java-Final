@@ -108,9 +108,24 @@ public class MainServlets extends HttpServlet {
                         //agent(request, response);
                         break;
                     case "/updateTable"://Insert, Update 
+                        if (!loggedIn) {
+                            servletPath = "/login";
+                            continue;
+                        }
                         updateTable(request, response);
                         break;
+                    case "/objectForm":
+                        if (!loggedIn) {
+                            servletPath = "/login";
+                            continue;
+                        }
+                        objectForm(request, response);
+                        break;
                     case "/delete": // delete
+                        if (!loggedIn) {
+                            servletPath = "/login";
+                            continue;
+                        }
                         delete(request, response);
                         break;
                     case "Error": // Error page
@@ -141,20 +156,60 @@ public class MainServlets extends HttpServlet {
     private void updateTable(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
         // this method is used to update and insert 
         int Id = -1;
-        if (request.getParameter("Id") != null) { // id should not be -1 to update
-            Id = Integer.valueOf(request.getParameter("Id"));
+        if (request.getParameter("id") != null) { // id should not be -1 to update
+            Id = Integer.valueOf(request.getParameter("id"));
         }
-        switch (CType.getCType(request.getParameter("Id"))) {
+        switch (CType.getCType(request.getParameter("cType"))) {
             case LOCATION:
                 printMarkingDAO.SqlCommand(new Location(Id, request.getParameter("locationName"), Integer.valueOf(request.getParameter("distributionCapacity"))));
                 break;
-            case AGENT:
-                printMarkingDAO.SqlCommand(new Agent(Id, request.getParameter("lastName"), request.getParameter("firstName"), request.getParameter("phoneNumb"), request.getParameter("email")));
+            case AGENT: // update Agent Tble from AgentForm and then update the current userSession
+                printMarkingDAO.SqlCommand(new Agent(((User) sessionObj.getAttribute("userSession")).ID, request.getParameter("lastName"), request.getParameter("firstName"), request.getParameter("phoneNumb"), request.getParameter("email")));
+                ((User) sessionObj.getAttribute("userSession")).setAgent((Agent) search(((User) sessionObj.getAttribute("userSession")).ID, CType.AGENT));
             case USER:
                 printMarkingDAO.SqlCommand(new User(Id, request.getParameter("userName"), UserType.getUserType(Integer.valueOf(request.getParameter("userType")))));
                 break;
         }
-        response.sendRedirect("listTable");
+        response.sendRedirect(request.getParameter("Redirect"));
+    }
+
+    private void objectForm(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
+        RequestDispatcher dispatcher = request.getRequestDispatcher("Error.jsp");;
+        switch (CType.getCType(request.getParameter("cType"))) {
+            case LOCATION:
+                dispatcher = request.getRequestDispatcher("LocationForm.jsp");
+                if (Integer.valueOf(request.getParameter("Id")) != -1) {
+                    Location test = (Location) search(Integer.valueOf(request.getParameter("Id")), CType.LOCATION);
+                    request.setAttribute("locationObj", test);
+                }
+                break;
+            case AGENT:
+                if (Integer.valueOf(request.getParameter("Id")) != -1) {
+                    dispatcher = request.getRequestDispatcher("AgentForm.jsp");
+                    request.setAttribute("agentObj", (Agent) search(Integer.valueOf(request.getParameter("Id")), CType.AGENT));
+                }
+                break;
+            case USER:
+                dispatcher = request.getRequestDispatcher("UserForm.jsp");
+                if (Integer.valueOf(request.getParameter("Id")) != -1) {
+                    request.setAttribute("userObj", (User) search(Integer.valueOf(request.getParameter("Id")), CType.CLIENT));
+                }
+                break;
+            case CLIENT:
+                dispatcher = request.getRequestDispatcher("ClientForm.jsp");
+                if (Integer.valueOf(request.getParameter("Id")) != -1) {
+                    request.setAttribute("clientObj", (Client) search(Integer.valueOf(request.getParameter("Id")), CType.CLIENT));
+                }
+                break;
+            case ORDER:
+                dispatcher = request.getRequestDispatcher("OrderForm.jsp");
+                if (Integer.valueOf(request.getParameter("Id")) != -1) {
+                    request.setAttribute("orderObj", (Order) search(Integer.valueOf(request.getParameter("Id")), CType.ORDER));
+                }
+                break;
+        }
+        request.setAttribute("Id", request.getParameter("Id"));
+        dispatcher.forward(request, response);
     }
 
     private void Error(ErrorType error, HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -190,36 +245,10 @@ public class MainServlets extends HttpServlet {
     }
 
     //Works for all Tables
-    private void search(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
-        SQLCommands temp = search(Integer.valueOf(request.getParameter("Id")), CType.getCType(request.getParameter("CType")));
-
-        RequestDispatcher dispatcher;
-
-        switch (temp.cType) {
-            case LOCATION:
-                dispatcher = request.getRequestDispatcher("LocationForm.jsp");
-                request.setAttribute("locationObj", (Location) temp);
-                break;
-            case AGENT:
-            case USER:
-                //not sure where to send
-                dispatcher = request.getRequestDispatcher("UnKown.jsp");
-                if (((User) temp).userType.equals(UserType.AGENT)) {
-                    ((User) temp).setAgent((Agent) search(temp.ID, CType.AGENT));
-                }
-                request.setAttribute("userObj", (User) temp);
-                break;
-            default:
-                dispatcher = null;
-        }
-        dispatcher.forward(request, response);
-    }
-
-    //Works for all Tables
     private void delete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException, SQLException {
         // this method will get the value from the "Admin.jsp" textbox and  
         printMarkingDAO.SqlCommand(new SQLCommands(Integer.valueOf(request.getParameter("Id")), CType.getCType(request.getParameter("CType")), false));
-        response.sendRedirect("listTable");
+        response.sendRedirect(request.getParameter("Redirect"));
     }
 
     //Add if else
@@ -227,13 +256,16 @@ public class MainServlets extends HttpServlet {
         CType cType = CType.getCType(request.getParameter("tableType"));
         ArrayList<SQLCommands> tableView = printMarkingDAO.getTable(cType);
         request.setAttribute("tableListType", cType.getTable());
-        
+
         switch (cType) {
             case LOCATION:
                 request.setAttribute("tableListLocation", (new ArrayList<Location>((Collection) tableView)));
                 break;
             case AGENT:
                 request.setAttribute("tableListAgent", (new ArrayList<Agent>((Collection) tableView)));
+                break;
+            case USER:
+                request.setAttribute("tableListUser", (new ArrayList<User>((Collection) tableView)));
                 break;
             case CLIENT:
                 request.setAttribute("tableListClient", (new ArrayList<Client>((Collection) tableView)));

@@ -17,7 +17,8 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-12">
-                    <form role="form" action="updateLocationTable" method="get">
+                    <form role="form" action="updateTable" method="get">
+                        <input type="hiden" name="Redirect" value="admin" />
                         <div class="form-group">
                             <a href="../src/java/servlets/MainServlets.java"></a>
                             <div class="form-group">
@@ -25,27 +26,27 @@
                                     Id:
                                 </label>
                                 <c:if test="${locationObj == null}">
-                                    <input type="text" name="id" class="form-control" value="Auto" disabled/>
+                                    <input type="text" class="form-control" value="Auto" disabled/>
                                 </c:if>
                                 <c:if test="${locationObj != null}">
-                                    
-                                    <input type="text" name="id" class="form-control" value="<c:out value='${locationObj.ID}' />" />
+                                    <input type="text" class="form-control" value="<c:out value='${locationObj.ID}' />" disabled/>
+                                    <input type="hidden" name="id" value="<c:out value='${locationObj.ID}' />" />;
                                 </c:if>
                             </div> 
                             <label for="locationName">
                                 Location Name:
                             </label>
-                            <input type="text" name="locationName" class="form-control" id="locationName" />
+                            <input type="text" name="locationName" class="form-control" value="<c:out value='${locationObj.location}' />" id="locationName" />
                         </div>
                         <div class="form-group">
 
                             <label for="distributionCapacity">
                                 Distribution Capacity:
                             </label>
-                            <input type="text" name="distributionCapacity" class="form-control" id="distributionCapacity" />
+                            <input type="text" name="distributionCapacity" class="form-control" value="<c:out value='${locationObj.distributionCapacity}' />" id="distributionCapacity" />
                         </div> 
-                            <input type="submit" class="btn btn-primary" value="Save" />
-                      
+                        <input type="submit" class="btn btn-primary" value="Save" />
+
                     </form>
                 </div>
             </div>

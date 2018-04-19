@@ -23,6 +23,31 @@ public class Client extends SQLCommands {
     private String email;
     private String company;
     private String companyType;
+
+    public Client(String firstName, String lastName, int streetNumber, String streetName, String city, String province, String postalCode, String telOffice, String telCell, String email, String company, String companyType) {
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.streetNumber = streetNumber;
+        this.streetName = streetName;
+        this.city = city;
+        this.province = province;
+        this.postalCode = postalCode;
+        this.telOffice = telOffice;
+        this.telCell = telCell;
+        this.email = email;
+        this.company = company;
+        this.companyType = companyType;
+        cType = CType.CLIENT;
+        qType = QType.INSERT;
+    }
+
+    public Client(int ID, String firstName, String lastName, int streetNumber, String streetName, String city, String province, String postalCode, String telOffice, String telCell, String email, String company, String companyType) {
+        this(firstName, lastName, streetNumber, streetName, city, province, postalCode, telOffice, telCell, email, company, companyType);
+        if (ID != -1) {
+            this.ID = ID;
+            qType = QType.UPDATE;
+        }
+    }
     
     public int getID() {
         return ID;
@@ -75,38 +100,6 @@ public class Client extends SQLCommands {
     public String getCompanyType() {
         return companyType;
     }
-    
-    
-
-    public Client(String firstName, String lastName, int streetNumber, String streetName, String city, String province, String postalCode, String telOffice, String telCell, String email, String company, String companyType) {
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.streetNumber = streetNumber;
-        this.streetName = streetName;
-        this.city = city;
-        this.province = province;
-        this.postalCode = postalCode;
-        this.telOffice = telOffice;
-        this.telCell = telCell;
-        this.email = email;
-        this.company = company;
-        this.companyType = companyType;
-        cType = CType.CLIENT;
-        qType = QType.INSERT;
-    }
-    
-    
-
-    public Client(int ID, String firstName, String lastName, int streetNumber, String streetName, String city, String province, String postalCode, String telOffice, String telCell, String email, String company, String companyType) {
-        this(firstName, lastName, streetNumber, streetName, city, province, postalCode, telOffice, telCell, email, company, companyType);
-        if (ID != -1) {
-            this.ID = ID;
-            qType = QType.UPDATE;
-        }
-    }
-    
-    
-   
     
     //Auto Quary Builder:
     @Override

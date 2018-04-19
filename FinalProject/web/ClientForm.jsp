@@ -13,7 +13,7 @@
     </head>
     <body>
     
-    <form action="MainServlets" action="get">
+    <form action="updateTable" action="get">
         First Name:
         <input type="text" name="firstName" /><br />
         Last Name:

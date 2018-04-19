@@ -25,6 +25,8 @@ public enum CType {
                 return AGENT;
             case "CLIENTS":
                 return CLIENT;
+            case "USER":
+                return USER;
             case "ORDERS":
                 return ORDER;
             case "LOCATIONXORDER":

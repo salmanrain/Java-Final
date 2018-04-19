@@ -78,7 +78,7 @@ public class PrintMarkingDAO {
         // the SQLCommands is represented as the parent class for every table/class
         // the command variable calls createCommand method from the QType and theis method takes a table name and the class 
         // the SqlCommand variable will type cast to the correct class 
-        String command = SQLCommand.qType.createCommand(SQLCommand.cType.getTable(), SQLCommand);
+        String command = SQLCommand.qType.createCommand(SQLCommand.cType.getTable(), SQLCommand); // the getOptional2 doesn't return the class ID
 
         SQLCommands toReturn = null;
 
@@ -93,16 +93,20 @@ public class PrintMarkingDAO {
 
             Agent agentTemp = null;
 
-            switch (SQLCommand.cType) {
-                case LOCATION:
-                    toReturn = new Location(resultSet.getInt("id"), resultSet.getString("locationName"), resultSet.getInt("distributionCapacity"));
-                    break;
-                case USER:
-                    toReturn = new User(resultSet.getInt("id"), resultSet.getString("userName"), UserType.getUserType(resultSet.getInt("userType")));
-                    break;
-                case AGENT:
-                    toReturn = new Agent(resultSet.getInt("id"), resultSet.getString("lastName"), resultSet.getString("firstName"), resultSet.getString("phoneNumb"), resultSet.getString("email"));
-                    break;
+            if (resultSet.next()) {
+                switch (SQLCommand.cType) {
+                    case LOCATION:
+                        toReturn = new Location(resultSet.getInt("id"), resultSet.getString("locationName"), resultSet.getInt("distributionCapacity"));
+                        break;
+                    case USER:
+                        toReturn = new User(resultSet.getInt("id"), resultSet.getString("userName"), UserType.getUserType(resultSet.getInt("userType")));
+                        break;
+                    case AGENT:
+                        toReturn = new Agent(resultSet.getInt("id"), resultSet.getString("lastName"), resultSet.getString("firstName"), resultSet.getString("phoneNumb"), resultSet.getString("email"));
+                        break;
+                }
+            } else {
+                System.err.println("NO RESULT");
             }
         } else {
             // otherwise just execute (Insert, Update, or Delete) sqlCommand 
@@ -136,10 +140,13 @@ public class PrintMarkingDAO {
                     tableView.add(new Agent(resultSet.getInt("id"), resultSet.getString("firstName"), resultSet.getString("lastName"), resultSet.getString("phoneNo"), resultSet.getString("email")));
                     break;
                 case CLIENT:
-                    tableView.add(new Client(resultSet.getInt("id"),resultSet.getString("firstName"),resultSet.getString("lastName"),resultSet.getInt("streetNumber"),resultSet.getString("streetName"),resultSet.getString("city"),resultSet.getString("province"),resultSet.getString("postalCode"), resultSet.getString("telOffice"), resultSet.getString("telCell"),resultSet.getString("email"),resultSet.getString("company"),resultSet.getString("companyType")));
+                    tableView.add(new Client(resultSet.getInt("id"), resultSet.getString("firstName"), resultSet.getString("lastName"), resultSet.getInt("streetNumber"), resultSet.getString("streetName"), resultSet.getString("city"), resultSet.getString("province"), resultSet.getString("postalCode"), resultSet.getString("telOffice"), resultSet.getString("telCell"), resultSet.getString("email"), resultSet.getString("company"), resultSet.getString("companyType")));
                     break;
                 case ORDER:
-                    tableView.add(new Order(resultSet.getInt("id"),resultSet.getInt("agentId"),resultSet.getInt("clientId"),resultSet.getInt("flyerQty"),resultSet.getString("flyerLayout"),resultSet.getBlob("flyerImg"),resultSet.getInt("personalCopy"), resultSet.getString("paymentInformation"),resultSet.getString("invoiceNumber"),resultSet.getString("comments"), resultSet.getInt("isFlyerArtApproved"),resultSet.getInt("isPaymentReceived")));
+                    tableView.add(new Order(resultSet.getInt("id"), resultSet.getInt("agentId"), resultSet.getInt("clientId"), resultSet.getInt("flyerQty"), resultSet.getString("flyerLayout"), resultSet.getBlob("flyerImg"), resultSet.getInt("personalCopy"), resultSet.getString("paymentInformation"), resultSet.getString("invoiceNumber"), resultSet.getString("comments"), resultSet.getInt("isFlyerArtApproved"), resultSet.getInt("isPaymentReceived")));
+                    break;
+                case USER:
+                    tableView.add(new User(resultSet.getInt("id"), resultSet.getString("userName"), UserType.getUserType(resultSet.getInt("userType"))));
                     break;
             }
         }

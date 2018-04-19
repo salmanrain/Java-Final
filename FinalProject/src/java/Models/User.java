@@ -6,6 +6,8 @@ public class User extends SQLCommands{
     public UserType userType;
     public Agent agent = null;
     
+    
+    
     public User(String userName, UserType userType) {
         this.userName = userName;
         this.userType = userType;
@@ -20,6 +22,19 @@ public class User extends SQLCommands{
             qType = QType.UPDATE;
         }
     }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public int getID() {
+        return ID;
+    }
+
+    public UserType getUserType() {
+        return userType;
+    }
+    
   
     public void setAgent(Agent agent) {
         this.agent = agent;
